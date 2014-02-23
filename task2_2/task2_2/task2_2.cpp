@@ -13,35 +13,37 @@ struct vocabl_word
 	char translation[LEN];
 	int tested;
 };
-/*tests chosen number of words from vocabluary and show the percent of correct answers*/
-void Words_Tester(struct vocabl_word *vocabluary, int allnum);
+/*tests chosen number of words from vocabluary and show the percent of correct answers
+takes as argument pointer on struct array and number of vocabluary words in created vocabluary*/
+void Words_Tester(struct vocabl_word *vocabluary, unsigned int vocablen);
 
 int main()
 {
-	int n;
+	
 	printf("Welcome to your personal language trainer!.\n\n");
 	printf("Enter English words and its translation on transliteration Ukraine language.\n");
 	printf("For example, family-simia. Maximum length of word/translation 20. \n\n");
 	printf("Enter how many words do you want to add to your vocabluary: ");
-	int retCode = scanf("%i",&n);
+
+	unsigned int num_of_words;
+	int retCode = scanf("%u",&num_of_words);
 	if (retCode == 0)
 	{
 		printf("Type mismatch. Next time please enter integer number;)");
 		return 0;
 	}
 	
-	struct vocabl_word* vocabluary = (vocabl_word*) malloc(n*sizeof(vocabl_word));
+	struct vocabl_word* vocabluary = (vocabl_word*) malloc(num_of_words*sizeof(vocabl_word));
 
 	char temp[LEN * 2 + 1];
 	int j;
-	char const separator = '-';
+	const char  separator = '-';
 
 	
 
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < num_of_words; i++)
 	{
 		printf("%i word: ", i + 1);
-		//gets(temp);
 		scanf("%s", &temp);
 		j = strchr(temp, separator) - temp;
 		strcpy(vocabluary[i].translation, temp + j + 1);
@@ -52,17 +54,23 @@ int main()
 
 
 	
-	Words_Tester(vocabluary, n);
-	//free(vocabluary);
+	Words_Tester(vocabluary, num_of_words);
+	free(vocabluary);
 	return 0;
 }
 
 
-void Words_Tester(struct vocabl_word *vocabluary, int allnum)
+void Words_Tester(struct vocabl_word *vocabluary, unsigned int vocablen)
 {
 	int attemp;
-	printf("\nEnter number of words that you want to train: ");
+	printf("\nEnter how many words do you want to train: ");
 	scanf("%i", &attemp);
+	if (attemp>vocablen)
+	{
+		printf("The number is bigger than vocabluary length so we just gonna train all words\n ");
+		attemp = vocablen;
+	}
+
 	system("cls");
 
 	
@@ -72,7 +80,7 @@ void Words_Tester(struct vocabl_word *vocabluary, int allnum)
 
 	while (i < attemp)
 	{
-		j = rand() % allnum;
+		j = rand() % vocablen;
 		if (vocabluary[j].tested == 0)
 		{
 			vocabluary[j].tested = 1;
