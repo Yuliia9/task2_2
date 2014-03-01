@@ -1,81 +1,154 @@
 #include "stdafx.h"
+#include "task2_2.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+const unsigned char ERROR = 0;
+const unsigned char SUCCESS = 1;
+const unsigned char MAIN_SUCCESS = 0;
 
-/* maximum length of word/translation*/
-const int LEN = 20;
-
-struct vocabl_word
-{
-	char word[LEN];
-	char translation[LEN];
-	int tested;
-};
-/*tests chosen number of words from vocabluary and show the percent of correct answers
-takes as argument pointer on struct array and number of vocabluary words in created vocabluary*/
-void Words_Tester(struct vocabl_word *vocabluary, unsigned int vocablen);
 
 int main()
 {
+	Interface();
 	
-	printf("Welcome to your personal language trainer!.\n\n");
-	printf("Enter English words and its translation on transliteration Ukraine language.\n");
-	printf("For example, family-simia. Maximum length of word/translation 20. \n\n");
-	printf("Enter how many words do you want to add to your vocabluary: ");
-
-	unsigned int num_of_words;
-	int retCode = scanf("%u",&num_of_words);
-	if (retCode == 0)
+	unsigned int num;
+	unsigned char retCode;
+	do 
 	{
-		printf("Type mismatch. Next time please enter integer number;)");
-		return 0;
+		printf("Enter how many words do you want to add to your vocabluary: ");
+		retCode = scanf("%u",&num);
+		fflush(stdin); // Flush the input buffer
+	} while (Type_checking(retCode, (int)num) == ERROR);
+	
+	
+	struct vword* vocabluary = (vword*) malloc(num*sizeof(vword));
+	if (vocabluary == NULL)
+	{
+		printf("Error occurs while trying to allocate memory for list of points. \n");
+		return (int)ERROR;
 	}
 	
-	struct vocabl_word* vocabluary = (vocabl_word*) malloc(num_of_words*sizeof(vocabl_word));
-
-	char temp[LEN * 2 + 1];
-	int j;
-	const char  separator = '-';
-
-	
-
-	for (int i = 0; i < num_of_words; i++)
+	retCode = Input(vocabluary, num);
+	if (retCode == ERROR)
 	{
-		printf("%i word: ", i + 1);
-		scanf("%s", &temp);
-		j = strchr(temp, separator) - temp;
-		strcpy(vocabluary[i].translation, temp + j + 1);
-		temp[j] = '\0';
-		strcpy(vocabluary[i].word, temp);
-		vocabluary[i].tested = 0;
+		return (int)ERROR;
 	}
 
-
-	
-	Words_Tester(vocabluary, num_of_words);
+	retCode =  Words_Tester(vocabluary, num);
+	if (retCode == ERROR)
+	{
+		printf("Error occurs while training to learn words.\n");
+		return (int)ERROR;
+	}
 	free(vocabluary);
-	return 0;
+	system("pause");
+	return MAIN_SUCCESS;
 }
 
 
-void Words_Tester(struct vocabl_word *vocabluary, unsigned int vocablen)
+void Interface()
 {
-	int attemp;
-	printf("\nEnter how many words do you want to train: ");
-	scanf("%i", &attemp);
+	printf("Welcome to your personal language trainer!. \n\n");
+	printf("Enter English words and its translation on transliteration Ukraine language.\n");
+	printf("Without spaces!\n");
+	printf("For example, family-simia. Maximum length of word/translation 20. \n\n");
+	
+}
+
+
+unsigned char Type_checking(int retCode, int val)
+{
+	if (retCode == ERROR)
+	{
+		printf("Type mismatch. Please next time check if you enter integer number. \n");
+		return ERROR;
+	}
+	if (val <= 0)
+	{
+		printf("The value can not be negative or null.\n");
+		return ERROR;
+	}
+	return SUCCESS;
+}
+
+
+
+unsigned char Input(struct vword* vocabluary, unsigned int num)
+{
+	if (vocabluary == NULL)
+	{
+		return ERROR;
+	}
+	char temp[LEN * 2 + 1];
+	unsigned int i;
+	int j;
+	const char  separator = '-';
+	unsigned char retCode;
+	
+
+	for (i = 0; i < num; ++i)
+	{
+		printf("%i word: ", i + 1);
+		gets(temp);
+		
+		j = strchr(temp, separator) - temp;
+		if (j <= 0)
+		{
+			printf("Please enter word and it's translation! \n");
+			--i;
+			continue;
+		}
+		temp[j] = '\0';
+		for (;;)
+		{
+			if (temp[j+1] == ' ')
+			{	
+				//printf("%c", temp[j + 1]);
+				++j;
+			}
+			else break;
+		} 
+		strcpy(vocabluary[i].translation, temp + j + 1);
+		
+		strcpy(vocabluary[i].word, temp);
+		vocabluary[i].tested = 0;
+		printf("%s", vocabluary[i].word);
+		printf("%s", vocabluary[i].translation);
+	}
+	return SUCCESS;
+}
+
+unsigned char Words_Tester(struct vword *vocabluary, unsigned int vocablen)
+{
+	if (vocabluary == NULL)
+	{
+		return ERROR;
+	}
+
+	unsigned char retCode;
+	unsigned int attemp;
+	
+	do
+	{
+		printf("\nEnter how many words do you want to train: ");
+		retCode = scanf("%u", &attemp);
+		fflush(stdin); // Flush the input buffer
+	} while (Type_checking(retCode, (int) attemp) == ERROR);
+
+	
+
+
+	system("cls");
 	if (attemp>vocablen)
 	{
 		printf("The number is bigger than vocabluary length so we just gonna train all words\n ");
 		attemp = vocablen;
 	}
-
-	system("cls");
-
 	
 	char temp[LEN * 2 + 1];
-	int correctansw = 0, i = 0, j;
+	unsigned int correctansw = 0, i = 0, j;
 	printf("Let's check you knowledge. \nEnter translation for following words.\n");
 
 	while (i < attemp)
@@ -93,7 +166,7 @@ void Words_Tester(struct vocabl_word *vocabluary, unsigned int vocablen)
 		++i;
 		printf("%s", vocabluary[j].word);
 		printf("-\t");
-		scanf("%s", &temp);
+		gets(temp);
 
 		if (strcmp(temp, vocabluary[j].translation) == 0)
 		{
@@ -102,4 +175,5 @@ void Words_Tester(struct vocabl_word *vocabluary, unsigned int vocablen)
 	}
 
 	printf("Percentage of correct answers is %0.2f percent \n", (float)correctansw / attemp * 100);
+	return SUCCESS;
 }
