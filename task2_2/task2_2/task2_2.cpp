@@ -21,9 +21,11 @@ int main()
 		retCode = scanf("%u",&num);
 		fflush(stdin); // Flush the input buffer
 	} while (Type_checking(retCode, (int)num) == ERROR);
-	
-	
+
+	printf("List will consist of %u words.\n", num);
 	struct vword* vocabluary = (vword*) malloc(num*sizeof(vword));
+
+
 	if (vocabluary == NULL)
 	{
 		printf("Error occurs while trying to allocate memory for list of points. \n");
@@ -33,6 +35,7 @@ int main()
 	retCode = Input(vocabluary, num);
 	if (retCode == ERROR)
 	{
+		free(vocabluary);
 		return (int)ERROR;
 	}
 
@@ -40,6 +43,7 @@ int main()
 	if (retCode == ERROR)
 	{
 		printf("Error occurs while training to learn words.\n");
+		free(vocabluary);
 		return (int)ERROR;
 	}
 	free(vocabluary);
@@ -58,7 +62,7 @@ void Interface()
 }
 
 
-unsigned char Type_checking(int retCode, int val)
+unsigned char Type_checking(unsigned char retCode, int val)
 {
 	if (retCode == ERROR)
 	{
@@ -67,7 +71,7 @@ unsigned char Type_checking(int retCode, int val)
 	}
 	if (val <= 0)
 	{
-		printf("The value can not be negative or null.\n");
+		printf("The value can not be negative or zero.\n");
 		return ERROR;
 	}
 	return SUCCESS;
@@ -79,6 +83,7 @@ unsigned char Input(struct vword* vocabluary, unsigned int num)
 {
 	if (vocabluary == NULL)
 	{
+		printf("Error occurs trying to get access to memory.\n");
 		return ERROR;
 	}
 	char temp[LEN * 2 + 1];
@@ -105,7 +110,6 @@ unsigned char Input(struct vword* vocabluary, unsigned int num)
 		{
 			if (temp[j+1] == ' ')
 			{	
-				//printf("%c", temp[j + 1]);
 				++j;
 			}
 			else break;
@@ -124,6 +128,7 @@ unsigned char Words_Tester(struct vword *vocabluary, unsigned int vocablen)
 {
 	if (vocabluary == NULL)
 	{
+		printf("Error occurs while training to get data. \n");
 		return ERROR;
 	}
 
