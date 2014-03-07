@@ -1,5 +1,19 @@
+/**
+* @file		task2_2.cpp
+* @brief	Program creates vocabluary of foreign word and it's transliteration translation,
+			random chooses words for testing and estimates percentage of correct answers
+*
+* Copyright 2014 by Yuliia Lyubchik
+*
+* This software is the confidential and proprietary information
+* of Yuliia Lyubchik. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only with permission from Yuliia.
+*/
+
+
 #include "stdafx.h"
-#include "task2_2.h"
+#include "task2_2.h" /*defines data types and prototypes of used in this file functions*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,32 +34,36 @@ int main()
 		printf("Enter how many words do you want to add to your vocabluary: ");
 		retCode = scanf("%u",&num);
 		fflush(stdin); // Flush the input buffer
-	} while (Type_checking(retCode, (int)num) == ERROR);
 
-	printf("List will consist of %u words.\n", num);
+	} while (Type_checking(retCode, (int) num) == ERROR);
+
+	printf("Vocabluary will consist of %u word(s).\n", num);
+
 	struct vword* vocabluary = (vword*) malloc(num*sizeof(vword));
-
-
 	if (vocabluary == NULL)
 	{
-		printf("Error occurs while trying to allocate memory for list of points. \n");
+		printf("Error occurs while trying to allocate memory for vocabluary. \n");
 		return (int)ERROR;
 	}
 	
+
 	retCode = Input(vocabluary, num);
 	if (retCode == ERROR)
 	{
+		printf("Error occurs while trying to input data. \n");
 		free(vocabluary);
 		return (int)ERROR;
 	}
+
 
 	retCode =  Words_Tester(vocabluary, num);
 	if (retCode == ERROR)
 	{
-		printf("Error occurs while training to learn words.\n");
+		printf("Error occurs while trying to train words.\n");
 		free(vocabluary);
-		return (int)ERROR;
+		return (int) ERROR;
 	}
+
 	free(vocabluary);
 	system("pause");
 	return MAIN_SUCCESS;
@@ -54,10 +72,12 @@ int main()
 
 void Interface()
 {
+	printf("----------------------------------------------------------------------------\n");
 	printf("Welcome to your personal language trainer!. \n\n");
-	printf("Enter English words and its translation on transliteration Ukraine language.\n");
+	printf("Enter English words and it's transliteration translation in Ukraine language.\n");
 	printf("Without spaces!\n");
-	printf("For example, family-simia. Maximum length of word/translation 20. \n\n");
+	printf("For example, family-simia. Maximum length of word/translation 20. \n");
+	printf("---------------------------------------------------------------------------\n\n");
 	
 }
 
@@ -83,7 +103,7 @@ unsigned char Input(struct vword* vocabluary, unsigned int num)
 {
 	if (vocabluary == NULL)
 	{
-		printf("Error occurs trying to get access to memory.\n");
+		printf("Error occurs while trying to get access to memory.\n");
 		return ERROR;
 	}
 	char temp[LEN * 2 + 1];
@@ -123,6 +143,8 @@ unsigned char Input(struct vword* vocabluary, unsigned int num)
 	}
 	return SUCCESS;
 }
+
+
 
 unsigned char Words_Tester(struct vword *vocabluary, unsigned int vocablen)
 {
